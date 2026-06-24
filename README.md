@@ -65,6 +65,30 @@ PYTHONPATH=../.. uvicorn app:create_app --factory --host 0.0.0.0 --port 8000
 
 See [docs/PORTFOLIO_EVIDENCE.md](docs/PORTFOLIO_EVIDENCE.md) for sample scoring output, platform validation commands, and interview proof points.
 
+## Production Docs
+
+- [Architecture](docs/architecture.md)
+- [Runbook](docs/runbook.md)
+- [Incident response](docs/incident-response.md)
+- [Cost estimate](docs/cost-estimate.md)
+- [Security controls](docs/security-controls.md)
+
+## Make Targets
+
+```bash
+make test
+make lint
+make score
+make security-scan
+make local-demo
+make deploy
+make destroy
+```
+
+## Interview Story
+
+This project demonstrates model-serving infrastructure on Kubernetes: API packaging, Helm deployment, Argo CD promotion, MLflow workflow support, Prometheus metrics, drift-check scaffolding and model-version rollback.
+
 ## What This Proves
 
 - Can support ML workloads with Kubernetes, Helm, GitOps, and observability

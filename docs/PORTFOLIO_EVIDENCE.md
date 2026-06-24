@@ -30,4 +30,15 @@ Sample score output:
 | Helm chart | `helm/ml-platform/` | Kubernetes deployment, service, HPA and ServiceMonitor. |
 | Argo CD app | `kubernetes/argocd/application.yaml` | GitOps deployment path. |
 | MLflow compose | `mlflow/docker-compose.yml` | Tracking and registry handoff concept. |
-| Rollback docs | `docs/RUNBOOK.md` | Model-version rollback and operational checks. |
+| Rollback docs | `docs/runbook.md` | Model-version rollback and operational checks. |
+
+## Screenshots And Proof To Capture
+
+- GitHub Actions CI run for scoring and layout validation.
+- Sample `python -m ml_platform.scoring` output.
+- Local MLflow tracking server page if running the compose demo.
+- Argo CD sync screen for the Helm chart.
+- `/healthz`, `/predict` and `/metrics` responses from the model API.
+- Grafana dashboard showing request and drift-warning metrics.
+
+Do not claim production drift detection until real tracked runs and drift reports exist.
