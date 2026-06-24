@@ -1,5 +1,7 @@
 # ML Platform Infrastructure on Kubernetes
 
+[![CI](https://github.com/mrsddq/ml-platform-infrastructure-on-kubernetes/actions/workflows/ci.yml/badge.svg)](https://github.com/mrsddq/ml-platform-infrastructure-on-kubernetes/actions/workflows/ci.yml)
+
 ML infrastructure portfolio repo for serving, deploying, observing, and promoting models on Kubernetes. This is intentionally framed as platform engineering for ML workloads, not pure model research.
 
 ## What This Builds
@@ -58,6 +60,10 @@ PYTHONPATH=../.. uvicorn app:create_app --factory --host 0.0.0.0 --port 8000
 4. Let Argo CD reconcile the chart.
 5. Monitor latency, error rate, request volume, and prediction warnings.
 6. Roll back by reverting the image tag or model version.
+
+## Portfolio Evidence
+
+See [docs/PORTFOLIO_EVIDENCE.md](docs/PORTFOLIO_EVIDENCE.md) for sample scoring output, platform validation commands, and interview proof points.
 
 ## What This Proves
 
