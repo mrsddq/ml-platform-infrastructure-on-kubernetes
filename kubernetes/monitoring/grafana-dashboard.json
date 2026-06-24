@@ -1,0 +1,22 @@
+{
+  "title": "ML Platform Serving",
+  "schemaVersion": 39,
+  "version": 1,
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Prediction Request Rate",
+      "targets": [{"expr": "rate(model_api_requests_total[5m])"}]
+    },
+    {
+      "type": "timeseries",
+      "title": "Prediction Error Rate",
+      "targets": [{"expr": "rate(model_api_errors_total[5m])"}]
+    },
+    {
+      "type": "timeseries",
+      "title": "Drift Warnings",
+      "targets": [{"expr": "rate(model_api_drift_warnings_total[5m])"}]
+    }
+  ]
+}

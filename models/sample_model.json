@@ -1,0 +1,13 @@
+{
+  "name": "rental-price-baseline",
+  "version": "1.0.0",
+  "intercept": 450.0,
+  "coefficients": {
+    "rooms": 180.0,
+    "sqft": 1.35
+  },
+  "training_ranges": {
+    "rooms": [1.0, 5.0],
+    "sqft": [450.0, 2500.0]
+  }
+}
