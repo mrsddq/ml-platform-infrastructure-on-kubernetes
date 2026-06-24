@@ -1,0 +1,35 @@
+name: Docker Smoke
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - services/model-api/**
+      - ml_platform/**
+      - models/**
+      - pyproject.toml
+      - .github/workflows/docker-smoke.yml
+  push:
+    branches: [main]
+    paths:
+      - services/model-api/**
+      - ml_platform/**
+      - models/**
+      - pyproject.toml
+      - .github/workflows/docker-smoke.yml
+
+permissions:
+  contents: read
+
+jobs:
+  docker-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build model API image
+        run: docker build -t ml-platform-model-api:smoke -f services/model-api/Dockerfile .
+      - name: Compile application in container
+        run: docker run --rm ml-platform-model-api:smoke python -m compileall app.py ml_platform
+      - name: Score sample payload in container
+        run: docker run --rm ml-platform-model-api:smoke python -m ml_platform.scoring --model models/sample_model.json --rooms 3 --sqft 1100
