@@ -39,6 +39,7 @@ make destroy
 
 ## Rollback
 
-- Revert image tag or model version in `helm/ml-platform/values.yaml`.
+- Revert the image tag and model path/name/version together in `helm/ml-platform/values.yaml`.
+- A mismatched artifact identity fails startup and readiness; inspect container logs before retrying.
 - Let Argo CD reconcile the previous version.
 - Confirm `/healthz`, `/predict` and `/metrics`.

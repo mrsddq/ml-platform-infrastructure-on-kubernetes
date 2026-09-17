@@ -4,6 +4,8 @@ image:
   pullPolicy: IfNotPresent
 
 model:
+  # Path inside the image or a mounted artifact. Identity must match the JSON.
+  path: /app/models/sample_model.json
   name: rental-price-baseline
   version: "1.0.0"
 

@@ -33,3 +33,18 @@ jobs:
         run: docker run --rm ml-platform-model-api:smoke python -B -c "import app; import ml_platform.scoring; import ml_platform.metrics; print('imports ok')"
       - name: Score sample payload in container
         run: docker run --rm ml-platform-model-api:smoke python -B -m ml_platform.scoring --model models/sample_model.json --rooms 3 --sqft 1100
+      - name: Exercise HTTP prediction and health contract
+        run: |
+          docker run -d --name model-api-smoke -p 127.0.0.1:8000:8000 \
+            -e MODEL_PATH=/app/models/sample_model.json -e MODEL_VERSION=1.0.0 \
+            ml-platform-model-api:smoke
+          trap 'docker logs model-api-smoke; docker rm -f model-api-smoke' EXIT
+          ready=false
+          for attempt in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:8000/healthz; then ready=true; break; fi
+            sleep 1
+          done
+          test "$ready" = true
+          curl --silent --show-error --fail http://127.0.0.1:8000/predict \
+            -H 'Content-Type: application/json' -d '{"rooms":3,"sqft":1100}' > /tmp/prediction.json
+          python -c 'import json; p=json.load(open("/tmp/prediction.json")); assert p["prediction"] == 2475.0 and p["model_version"] == "1.0.0", p'
