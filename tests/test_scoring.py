@@ -4,7 +4,6 @@ from pathlib import Path
 from ml_platform.metrics import MetricsRegistry
 from ml_platform.scoring import drift_warnings, load_model, prediction_payload
 
-
 ROOT = Path(__file__).resolve().parents[1]
 
 

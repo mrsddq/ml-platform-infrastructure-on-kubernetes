@@ -16,6 +16,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Install API and test dependencies
+        run: python -m pip install -e ".[serve,test]"
       - name: Run validation
         run: make validate
       - name: Render sample score

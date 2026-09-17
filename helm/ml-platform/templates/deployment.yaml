@@ -24,6 +24,8 @@ spec:
           ports:
             - containerPort: {{ .Values.service.targetPort }}
           env:
+            - name: MODEL_PATH
+              value: {{ .Values.model.path | quote }}
             - name: MODEL_NAME
               value: {{ .Values.model.name | quote }}
             - name: MODEL_VERSION

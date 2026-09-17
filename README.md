@@ -2,18 +2,18 @@
 
 [![CI](https://github.com/mrsddq/ml-platform-infrastructure-on-kubernetes/actions/workflows/ci.yml/badge.svg)](https://github.com/mrsddq/ml-platform-infrastructure-on-kubernetes/actions/workflows/ci.yml)
 
-ML infrastructure portfolio repo for serving, deploying, observing, and promoting models on Kubernetes. This is intentionally framed as platform engineering for ML workloads, not pure model research.
+An executable model-serving demo with a deterministic linear rental scorer, a tested HTTP contract, and Kubernetes deployment configuration. The coefficients are illustrative; this repository does not train a model, fetch models from MLflow, or demonstrate measured production performance.
 
 ## What This Builds
 
-- FastAPI-style model serving contract with health, prediction, and metrics endpoints
+- FastAPI model serving API with health, prediction, and metrics endpoints
 - Lightweight scoring library and model metadata file for offline tests
 - Dockerfile for the model API
 - Helm chart for Kubernetes deployment, service, HPA, config, and service account
 - Argo CD Application for GitOps delivery
 - Prometheus ServiceMonitor and Grafana dashboard starter
 - MLflow tracking server local compose file
-- Drift-check placeholder and model registry handoff docs
+- Input-range warnings (not statistical drift detection) and documented model registry handoff
 - CI tests that validate code, chart structure, and platform artifacts
 
 ## Architecture
@@ -33,9 +33,10 @@ flowchart LR
 
 ## Local Demo
 
-Run tests:
+Install the API and test dependencies, then run tests:
 
 ```bash
+python -m pip install -e ".[serve,test]"
 make test
 ```
 
@@ -45,21 +46,37 @@ Score a sample payload:
 python -m ml_platform.scoring --model models/sample_model.json --rooms 3 --sqft 1100
 ```
 
-Run the API if FastAPI is installed:
+Run from the repository root:
 
 ```bash
-cd services/model-api
-PYTHONPATH=../.. uvicorn app:create_app --factory --host 0.0.0.0 --port 8000
+uvicorn app:create_app --factory --app-dir services/model-api --host 127.0.0.1 --port 8000
 ```
 
-## Platform Deployment Flow
+## Artifact selection and rollout contract
 
-1. Train and register model in MLflow.
-2. Build and scan the model API image.
-3. Update image tag and model version in Helm values.
-4. Let Argo CD reconcile the chart.
-5. Monitor latency, error rate, request volume, and prediction warnings.
-6. Roll back by reverting the image tag or model version.
+`MODEL_PATH` selects a JSON artifact inside the image or a mounted volume. Optional
+`MODEL_NAME` and `MODEL_VERSION` must match that artifact; startup fails on a missing
+file, invalid schema, or identity mismatch. Helm sets all three values. Updating only
+`model.version` cannot silently relabel the old model.
+
+```bash
+MODEL_PATH=models/sample_model.json MODEL_VERSION=1.0.0 \
+  uvicorn app:create_app --factory --app-dir services/model-api
+curl -fsS http://127.0.0.1:8000/predict -H 'Content-Type: application/json' \
+  -d '{"rooms":3,"sqft":1100}'
+# prediction=2475.0; model_version=1.0.0
+```
+
+For a new artifact, build and publish an image containing it, then update the image
+tag, `model.path`, `model.name`, and `model.version` together. Reverting that complete
+configuration provides the rollback path. The default image reference is a deployment
+placeholder: build/push your own image before deployment. ServiceMonitor requires the
+Prometheus Operator CRD; disable `serviceMonitor.enabled` otherwise.
+
+Tests use a second artifact with a different intercept to verify actual prediction
+changes, identity mismatch failures, JSON body handling, invalid inputs, and error
+metrics. Counters are thread-safe but process-local; use one worker per pod and sum
+across pods. Input-range warnings are a simple heuristic, not a data-drift detector.
 
 ## Portfolio Evidence
 
@@ -87,7 +104,7 @@ make destroy
 
 ## Interview Story
 
-This project demonstrates model-serving infrastructure on Kubernetes: API packaging, Helm deployment, Argo CD promotion, MLflow workflow support, Prometheus metrics, drift-check scaffolding and model-version rollback.
+This project demonstrates tested API packaging, explicit artifact identity, Helm deployment configuration, an Argo CD manifest, and Prometheus counters. MLflow promotion is a proposed integration; the included compose service is independent of the scorer.
 
 ## What This Proves
 
